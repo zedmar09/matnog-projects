@@ -117,6 +117,16 @@ export function createProjectDummyData(count = 72): Project[] {
       deliveryStage === "Completed" ? 0 : index % 13 === 0 ? 74 : index % 7 === 0 ? 34 : index % 5 === 0 ? 12 : 0;
     const riskLevel = riskFor(deliveryStage, slippageDays, readinessBlockers);
     const source = fundingSources[zeroIndex % fundingSources.length];
+    const emergency = index % 17 === 0;
+    const proposalSource = emergency
+      ? "Emergency Assessment"
+      : !barangay
+        ? "Department Proposal"
+        : index % 5 === 0
+          ? "Constituent Request"
+          : index % 3 === 0
+            ? "Barangay BDP"
+            : "Council Resolution";
     const startMonth = zeroIndex % 10;
     const completionMonth = Math.min(11, startMonth + 2 + (zeroIndex % 4));
     const targetStart = isoDate(Number(fiscalYear), startMonth, 8 + (index % 12));
@@ -150,7 +160,7 @@ export function createProjectDummyData(count = 72): Project[] {
       problemStatement: `${barangay ?? "Municipality-wide"} residents experience service gaps that affect safe and reliable access to ${projectType.toLocaleLowerCase()} facilities and support.`,
       expectedOutcome: `Improved access, safety, and service reliability for ${180 + ((index * 137) % 4_600)} intended beneficiaries.`,
       projectType,
-      proposalSource: barangay ? (index % 3 === 0 ? "Barangay BDP" : "Council Resolution") : "Department Proposal",
+      proposalSource,
       implementingDepartment: department,
       requestingOffice: barangay ? `Barangay ${barangay}` : department,
       leadOfficer: ["Engr. Mara D. Reyes", "Ar. Noel B. Fronda", "LGOO Ana P. Santos", "RHU Dr. Liza M. Ramos"][
@@ -165,7 +175,7 @@ export function createProjectDummyData(count = 72): Project[] {
       proposalCompleteness: pipelineStatus === "Draft" ? Math.min(96, 54 + (index % 7) * 7) : 100,
       priorityRank: index,
       fiscalYear,
-      multiYear: index % 9 === 0,
+      multiYear: index % 8 === 0,
       planReferences: [
         `AIP-${fiscalYear}-${String(index).padStart(3, "0")}`,
         `LDIP-2026-${projectType.slice(0, 3).toUpperCase()}`,
@@ -203,7 +213,7 @@ export function createProjectDummyData(count = 72): Project[] {
       tags: index % 6 === 0 ? ["DRR", "Climate action"] : index % 5 === 0 ? ["GAD", "SDG"] : ["AIP"],
       documentCount: 6 + (index % 17),
       documentCompleteness: Math.min(100, 52 + (index % 7) * 8),
-      emergency: index % 17 === 0,
+      emergency,
       milestones: [
         {
           id: `milestone-${index}-1`,

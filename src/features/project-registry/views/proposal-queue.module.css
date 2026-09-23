@@ -329,6 +329,74 @@
   background: #fff0ee;
 }
 
+.statusBadge {
+  display: inline-flex;
+  padding: 4px 7px;
+  color: #52605d;
+  background: #eef1f0;
+  border-radius: 999px;
+  font-size: 8px;
+  font-weight: 620;
+  white-space: nowrap;
+}
+
+.statusDraft {
+  color: #6d6260;
+  background: #f2eeee;
+}
+
+.statusSubmitted {
+  color: #326d68;
+  background: #e9f5f3;
+}
+
+.statusUnderReview {
+  color: #7b5d2d;
+  background: #fbf2df;
+}
+
+.statusPrioritized {
+  color: #365f79;
+  background: #eaf2f8;
+}
+
+.statusFunded {
+  color: #28704e;
+  background: #e8f6ed;
+}
+
+.statusDeferred {
+  color: #785c3c;
+  background: #f6efe7;
+}
+
+.statusRejected {
+  color: #934a42;
+  background: #faecea;
+}
+
+.evidenceCell {
+  min-width: 145px;
+}
+
+.evidenceCell strong {
+  display: block;
+  color: #46514f;
+  font-size: 9px;
+  font-weight: 610;
+}
+
+.evidenceCell small {
+  display: block;
+  max-width: 170px;
+  overflow: hidden;
+  margin-top: 3px;
+  color: #92989a;
+  font-size: 7.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .actionsCell {
   display: flex;
   min-width: 165px;
