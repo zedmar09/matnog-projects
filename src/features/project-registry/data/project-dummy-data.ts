@@ -4,6 +4,7 @@ import { DEFAULT_SCORING_CRITERIA } from "../constants/scoring-criteria";
 
 import type {
   FundingSource,
+  PriorityRankingRecord,
   Project,
   ProjectDeliveryStage,
   ProjectFundingAllocation,
@@ -102,8 +103,10 @@ function riskFor(stage: ProjectDeliveryStage, slippageDays: number, blockers: nu
 
 function technicalReviewFor(index: number, pipelineStatus: ProjectPipelineStatus): TechnicalReview {
   const reviewVariant = index % 5;
-  const status: TechnicalReview["status"] =
-    pipelineStatus !== "Under Review"
+  const alreadyAdvanced = pipelineStatus === "Prioritized" || pipelineStatus === "Funded";
+  const status: TechnicalReview["status"] = alreadyAdvanced
+    ? "Completed"
+    : pipelineStatus !== "Under Review"
       ? "Pending"
       : reviewVariant === 0 || reviewVariant === 3
         ? "Completed"
@@ -153,12 +156,13 @@ function technicalReviewFor(index: number, pipelineStatus: ProjectPipelineStatus
   };
 }
 
-function scoringFor(index: number, review: TechnicalReview): ProjectScoring {
+function scoringFor(index: number, review: TechnicalReview, pipelineStatus: ProjectPipelineStatus): ProjectScoring {
   const eligible = review.status === "Completed" && review.recommendation === "Advance to Scoring";
+  const alreadyAdvanced = pipelineStatus === "Prioritized" || pipelineStatus === "Funded";
   const variant = index % 4;
   const status: ProjectScoring["status"] = !eligible
     ? "Not Started"
-    : variant === 0
+    : alreadyAdvanced || variant === 0
       ? "Finalized"
       : variant === 2
         ? "In Progress"
@@ -185,6 +189,26 @@ function scoringFor(index: number, review: TechnicalReview): ProjectScoring {
         rationale: assessed ? `Assessment reflects available evidence for ${criterion.label.toLocaleLowerCase()}.` : "",
       };
     }),
+  };
+}
+
+function priorityRankingFor(
+  index: number,
+  pipelineStatus: ProjectPipelineStatus,
+  scoring: ProjectScoring,
+): PriorityRankingRecord {
+  const published = pipelineStatus === "Prioritized" || pipelineStatus === "Funded";
+  const finalized = scoring.status === "Finalized";
+  return {
+    decision: published ? "Recommended" : finalized && index % 3 === 1 ? "On Hold" : "Pending Deliberation",
+    committeeNote: published
+      ? "Approved for inclusion in the municipal priority investment list."
+      : finalized && index % 3 === 1
+        ? "Retain for committee deliberation alongside available fiscal space."
+        : "",
+    decidedBy: published ? "Municipal Development Council Secretariat" : "Unassigned",
+    decidedAt: published ? isoDate(2026, 8, 22) : null,
+    publishedAt: published ? isoDate(2026, 8, 23) : null,
   };
 }
 
@@ -254,6 +278,7 @@ export function createProjectDummyData(count = 72): Project[] {
           ];
 
     const technicalReview = technicalReviewFor(index, pipelineStatus);
+    const scoring = scoringFor(index, technicalReview, pipelineStatus);
 
     return {
       id: `project-${String(index).padStart(4, "0")}`,
@@ -277,7 +302,8 @@ export function createProjectDummyData(count = 72): Project[] {
       deliveryStage,
       proposalCompleteness: pipelineStatus === "Draft" ? Math.min(96, 54 + (index % 7) * 7) : 100,
       technicalReview,
-      scoring: scoringFor(index, technicalReview),
+      scoring,
+      priorityRanking: priorityRankingFor(index, pipelineStatus, scoring),
       priorityRank: index,
       fiscalYear,
       multiYear: index % 8 === 0,

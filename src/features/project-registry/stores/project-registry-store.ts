@@ -5,6 +5,7 @@ import { create } from "zustand";
 import { DEFAULT_SCORING_CRITERIA } from "../constants/scoring-criteria";
 import { createProjectDummyData } from "../data/project-dummy-data";
 import type {
+  PriorityRankingRecord,
   Project,
   ProjectActivity,
   ProjectPipelineStatus,
@@ -25,6 +26,8 @@ type ProjectRegistryState = {
   transitionProject: (id: string, status: ProjectPipelineStatus, note: string) => Project | undefined;
   saveTechnicalReview: (id: string, review: TechnicalReview) => Project | undefined;
   saveProjectScoring: (id: string, scoring: ProjectScoring) => Project | undefined;
+  savePriorityDecision: (id: string, ranking: PriorityRankingRecord) => Project | undefined;
+  publishPriorityRanking: (ids: string[]) => number;
   updateScoringCriteria: (criteria: ScoringCriterion[]) => boolean;
   getProjectById: (id: string) => Project | undefined;
   addActivity: (projectId: string, activity: Omit<ProjectActivity, "id">) => ProjectActivity | undefined;
@@ -73,6 +76,13 @@ export const useProjectRegistryStore = create<ProjectRegistryState>((set, get) =
         notes: "",
         finalizedAt: null,
         entries: get().scoringCriteria.map((criterion) => ({ criterionId: criterion.id, rating: null, rationale: "" })),
+      },
+      priorityRanking: {
+        decision: "Pending Deliberation",
+        committeeNote: "",
+        decidedBy: "Unassigned",
+        decidedAt: null,
+        publishedAt: null,
       },
       priorityRank: get().projects.length + 1,
       appropriation: 0,
@@ -172,6 +182,52 @@ export const useProjectRegistryStore = create<ProjectRegistryState>((set, get) =
     };
     set((state) => ({ projects: state.projects.map((project) => (project.id === id ? updated : project)) }));
     return updated;
+  },
+  savePriorityDecision: (id, priorityRanking) => {
+    const current = get().projects.find((project) => project.id === id);
+    if (!current) return undefined;
+    const date = today();
+    const activity: ProjectActivity = {
+      id: `activity-session-${id}-${current.activities.length + 1}`,
+      date,
+      action: "Priority decision updated",
+      actor: priorityRanking.decidedBy,
+      note: priorityRanking.decision,
+    };
+    const updated: Project = {
+      ...current,
+      priorityRanking,
+      lastUpdated: date,
+      activities: [activity, ...current.activities],
+    };
+    set((state) => ({ projects: state.projects.map((project) => (project.id === id ? updated : project)) }));
+    return updated;
+  },
+  publishPriorityRanking: (ids) => {
+    const idSet = new Set(ids);
+    const date = today();
+    let published = 0;
+    set((state) => ({
+      projects: state.projects.map((project) => {
+        if (!idSet.has(project.id) || project.pipelineStatus !== "Under Review") return project;
+        published += 1;
+        const activity: ProjectActivity = {
+          id: `activity-session-${project.id}-${project.activities.length + 1}`,
+          date,
+          action: "Published to priority ranking",
+          actor: "Municipal Development Council Secretariat",
+          note: "Committee recommendation published and project moved to Prioritized.",
+        };
+        return {
+          ...project,
+          pipelineStatus: "Prioritized" as const,
+          priorityRanking: { ...project.priorityRanking, publishedAt: date },
+          lastUpdated: date,
+          activities: [activity, ...project.activities],
+        };
+      }),
+    }));
+    return published;
   },
   updateScoringCriteria: (scoringCriteria) => {
     const total = scoringCriteria.reduce((sum, criterion) => sum + criterion.weight, 0);

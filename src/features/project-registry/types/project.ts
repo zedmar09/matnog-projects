@@ -65,6 +65,16 @@ export type ProjectScoring = {
   entries: ProjectScoreEntry[];
 };
 
+export type PriorityDecision = "Pending Deliberation" | "Recommended" | "On Hold" | "Deferred";
+
+export type PriorityRankingRecord = {
+  decision: PriorityDecision;
+  committeeNote: string;
+  decidedBy: string;
+  decidedAt: string | null;
+  publishedAt: string | null;
+};
+
 export type ProjectSortKey =
   | "code"
   | "title"
@@ -142,6 +152,7 @@ export type Project = {
   proposalCompleteness: number;
   technicalReview: TechnicalReview;
   scoring: ProjectScoring;
+  priorityRanking: PriorityRankingRecord;
   priorityRank: number;
   fiscalYear: string;
   multiYear: boolean;
