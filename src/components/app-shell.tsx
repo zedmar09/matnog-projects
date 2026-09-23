@@ -6,7 +6,6 @@ import {
   ChevronDown,
   ChevronRight,
   CircleUserRound,
-  Landmark,
   LogOut,
   MapPin,
   Menu,
@@ -14,7 +13,6 @@ import {
   PanelLeftOpen,
   Search,
   Settings,
-  ShieldCheck,
   SunMedium,
   UserRound,
   X,
@@ -82,17 +80,6 @@ function Sidebar() {
           >
             <X size={19} />
           </button>
-        </div>
-
-        <div className={styles.municipalityCard}>
-          <span className={styles.municipalityIcon} aria-hidden="true">
-            <Landmark size={17} />
-          </span>
-          <span className={styles.municipalityCopy}>
-            <small>Local government unit</small>
-            <strong>Matnog, Sorsogon</strong>
-          </span>
-          <ShieldCheck className={styles.verifiedIcon} size={15} aria-label="Verified workspace" />
         </div>
 
         <nav className={styles.navigation}>

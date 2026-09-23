@@ -57,7 +57,6 @@
 }
 
 .brandCopy,
-.municipalityCopy,
 .profileCopy {
   display: flex;
   min-width: 0;
@@ -79,51 +78,6 @@
   line-height: 1.15;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.municipalityCard {
-  display: flex;
-  min-height: 58px;
-  align-items: center;
-  gap: 10px;
-  margin: 14px 12px 6px;
-  padding: 10px;
-  background: rgb(255 255 255 / 5%);
-  border: 1px solid rgb(255 255 255 / 8%);
-  border-radius: 10px;
-}
-
-.municipalityIcon {
-  display: grid;
-  width: 28px;
-  height: 28px;
-  flex: 0 0 28px;
-  place-items: center;
-  color: #6ec6bd;
-  background: rgb(21 148 136 / 13%);
-  border-radius: 7px;
-}
-
-.municipalityCopy {
-  flex: 1;
-}
-
-.municipalityCopy small {
-  color: #989ca3;
-  font-size: 9.5px;
-  line-height: 1.2;
-}
-
-.municipalityCopy strong {
-  margin-top: 2px;
-  font-size: 11px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.verifiedIcon {
-  flex: 0 0 auto;
-  color: #76c893;
 }
 
 .navigation {
@@ -221,7 +175,7 @@
 }
 
 .navParentAlert > svg:first-child {
-  color: #ff9a55;
+  color: #6ec6bd;
 }
 
 .alertDot {
@@ -588,8 +542,6 @@
 }
 
 .sidebarCollapsed .brandCopy,
-.sidebarCollapsed .municipalityCopy,
-.sidebarCollapsed .verifiedIcon,
 .sidebarCollapsed .navSection h2,
 .sidebarCollapsed .navItem span,
 .sidebarCollapsed .navParent span,
@@ -599,14 +551,6 @@
 .sidebarCollapsed .collapseButton span,
 .sidebarCollapsed .sidebarFooter p {
   display: none;
-}
-
-.sidebarCollapsed .municipalityCard {
-  width: 44px;
-  min-height: 44px;
-  justify-content: center;
-  margin: 14px auto 6px;
-  padding: 7px;
 }
 
 .sidebarCollapsed .navItem,
@@ -660,8 +604,6 @@
   }
 
   .sidebarCollapsed .brandCopy,
-  .sidebarCollapsed .municipalityCopy,
-  .sidebarCollapsed .verifiedIcon,
   .sidebarCollapsed .navSection h2,
   .sidebarCollapsed .navItem span,
   .sidebarCollapsed .navParent span,
@@ -674,14 +616,6 @@
 
   .sidebarCollapsed .brandRow {
     padding: 0 16px;
-  }
-
-  .sidebarCollapsed .municipalityCard {
-    width: auto;
-    min-height: 58px;
-    justify-content: flex-start;
-    margin: 14px 12px 6px;
-    padding: 10px;
   }
 
   .collapseButton {
