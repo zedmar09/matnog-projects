@@ -80,6 +80,8 @@ export type Project = {
   code: string;
   title: string;
   description: string;
+  problemStatement: string;
+  expectedOutcome: string;
   projectType: string;
   proposalSource: string;
   implementingDepartment: string;
@@ -125,6 +127,8 @@ export type ProjectProposalInput = Pick<
   Project,
   | "title"
   | "description"
+  | "problemStatement"
+  | "expectedOutcome"
   | "projectType"
   | "proposalSource"
   | "implementingDepartment"

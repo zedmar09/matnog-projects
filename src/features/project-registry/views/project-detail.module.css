@@ -273,6 +273,31 @@
   line-height: 1.65;
 }
 
+.narrativeGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.narrativeGrid > div {
+  padding: 14px 16px;
+}
+
+.narrativeGrid > div:first-child {
+  border-right: 1px solid #edf0ef;
+}
+
+.narrativeGrid span {
+  color: #8b9194;
+  font-size: 8.5px;
+}
+
+.narrativeGrid p {
+  margin: 6px 0 0;
+  color: #596164;
+  font-size: 10px;
+  line-height: 1.6;
+}
+
 .fieldGrid {
   display: grid;
   padding: 5px 16px 14px;
@@ -885,6 +910,7 @@
 
   .metricStrip,
   .fieldGrid,
+  .narrativeGrid,
   .checklist,
   .statPanelGrid,
   .documentGrid,
@@ -900,6 +926,11 @@
 
   .metricStrip article:last-child {
     border-bottom: 0;
+  }
+
+  .narrativeGrid > div:first-child {
+    border-right: 0;
+    border-bottom: 1px solid #edf0ef;
   }
 
   .twoColumnLayout,

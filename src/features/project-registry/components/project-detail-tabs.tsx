@@ -63,6 +63,18 @@ function SummaryTab({ project }: { project: Project }) {
             <Field label="Requesting office" value={project.requestingOffice} />
           </div>
         </Panel>
+        <Panel title="Need and intended outcome">
+          <div className={styles.narrativeGrid}>
+            <div>
+              <span>Problem statement</span>
+              <p>{project.problemStatement}</p>
+            </div>
+            <div>
+              <span>Expected outcome</span>
+              <p>{project.expectedOutcome}</p>
+            </div>
+          </div>
+        </Panel>
         <Panel title="Funding composition" description="Approved or proposed funding assigned to this project.">
           <div className={styles.listRows}>
             {project.funding.map((item) => (

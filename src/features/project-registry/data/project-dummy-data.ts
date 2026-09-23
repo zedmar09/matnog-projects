@@ -147,6 +147,8 @@ export function createProjectDummyData(count = 72): Project[] {
       code: `MAT-${fiscalYear}-${String(index).padStart(3, "0")}`,
       title: projectTitle,
       description: `${baseTitle} to improve safe, reliable access to essential municipal services for residents of ${barangay ?? "Matnog"}.`,
+      problemStatement: `${barangay ?? "Municipality-wide"} residents experience service gaps that affect safe and reliable access to ${projectType.toLocaleLowerCase()} facilities and support.`,
+      expectedOutcome: `Improved access, safety, and service reliability for ${180 + ((index * 137) % 4_600)} intended beneficiaries.`,
       projectType,
       proposalSource: barangay ? (index % 3 === 0 ? "Barangay BDP" : "Council Resolution") : "Department Proposal",
       implementingDepartment: department,
