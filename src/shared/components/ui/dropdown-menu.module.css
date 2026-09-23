@@ -1,0 +1,60 @@
+.content {
+  z-index: 90;
+  min-width: 184px;
+  padding: 5px;
+  color: #344441;
+  background: #fff;
+  border: 1px solid #dce4e2;
+  border-radius: 9px;
+  box-shadow: 0 14px 38px rgb(25 52 49 / 16%);
+}
+
+.item {
+  position: relative;
+  display: flex;
+  min-height: 33px;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 9px;
+  border-radius: 6px;
+  outline: 0;
+  font-size: 10.5px;
+  line-height: 1.35;
+  cursor: default;
+  user-select: none;
+}
+
+.item[data-highlighted] {
+  color: #0f7168;
+  background: #eaf5f3;
+}
+
+.item[data-disabled] {
+  opacity: 0.48;
+  pointer-events: none;
+}
+
+.checkboxItem {
+  padding-left: 30px;
+}
+
+.indicator {
+  position: absolute;
+  left: 9px;
+  display: grid;
+  color: #159488;
+  place-items: center;
+}
+
+.label {
+  padding: 7px 9px 5px;
+  color: #858b90;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.separator {
+  height: 1px;
+  margin: 4px;
+  background: #ecefef;
+}

@@ -19,6 +19,31 @@ export type ProjectDeliveryStage =
 
 export type ProjectRiskLevel = "Low" | "Moderate" | "High" | "Critical";
 
+export type ProjectSortKey =
+  | "code"
+  | "title"
+  | "barangay"
+  | "department"
+  | "fiscalYear"
+  | "budget"
+  | "pipelineStatus"
+  | "deliveryStage"
+  | "physicalProgress"
+  | "financialProgress"
+  | "riskLevel"
+  | "targetCompletion";
+
+export type ProjectFilters = {
+  search: string;
+  pipelineStatus: string;
+  deliveryStage: string;
+  fundingSource: string;
+  department: string;
+  barangay: string;
+  projectType: string;
+  riskLevel: string;
+};
+
 export type FundingSource =
   | "20% Development Fund"
   | "General Fund"

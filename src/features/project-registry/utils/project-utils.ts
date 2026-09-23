@@ -1,6 +1,24 @@
 import type { JurisdictionScope } from "@/stores/shell-store";
 
-import type { FundingSource, Project, ProjectActivity, ProjectPipelineStatus } from "../types/project";
+import type {
+  FundingSource,
+  Project,
+  ProjectActivity,
+  ProjectFilters,
+  ProjectPipelineStatus,
+  ProjectSortKey,
+} from "../types/project";
+
+export const EMPTY_PROJECT_FILTERS: ProjectFilters = {
+  search: "",
+  pipelineStatus: "all",
+  deliveryStage: "all",
+  fundingSource: "all",
+  department: "all",
+  barangay: "all",
+  projectType: "all",
+  riskLevel: "all",
+};
 
 const PIPELINE_ORDER: ProjectPipelineStatus[] = [
   "Draft",
@@ -50,6 +68,58 @@ export function filterProjectsByScope(projects: Project[], fiscalYear: string, j
     if (jurisdiction === "municipal") return true;
     if (jurisdiction === "all-barangays") return project.barangay !== null;
     return project.barangay === JURISDICTION_NAMES[jurisdiction] || project.barangay === null;
+  });
+}
+
+export function filterProjects(projects: Project[], filters: ProjectFilters) {
+  const query = filters.search.trim().toLocaleLowerCase();
+
+  return projects.filter((project) => {
+    if (query) {
+      const searchValue = [
+        project.code,
+        project.title,
+        project.barangay ?? "Municipality-wide",
+        project.implementingDepartment,
+        project.contractor ?? "",
+        ...project.funding.map((item) => item.source),
+      ]
+        .join(" ")
+        .toLocaleLowerCase();
+      if (!searchValue.includes(query)) return false;
+    }
+
+    if (filters.pipelineStatus !== "all" && project.pipelineStatus !== filters.pipelineStatus) return false;
+    if (filters.deliveryStage !== "all" && project.deliveryStage !== filters.deliveryStage) return false;
+    if (filters.fundingSource !== "all" && !project.funding.some((item) => item.source === filters.fundingSource)) {
+      return false;
+    }
+    if (filters.department !== "all" && project.implementingDepartment !== filters.department) return false;
+    if (filters.barangay !== "all") {
+      if (filters.barangay === "municipal" && project.barangay !== null) return false;
+      if (filters.barangay !== "municipal" && project.barangay !== filters.barangay) return false;
+    }
+    if (filters.projectType !== "all" && project.projectType !== filters.projectType) return false;
+    if (filters.riskLevel !== "all" && project.riskLevel !== filters.riskLevel) return false;
+    return true;
+  });
+}
+
+const RISK_ORDER = { Low: 0, Moderate: 1, High: 2, Critical: 3 } as const;
+
+export function sortProjects(projects: Project[], key: ProjectSortKey, direction: "asc" | "desc") {
+  const factor = direction === "asc" ? 1 : -1;
+
+  return projects.toSorted((a, b) => {
+    let comparison = 0;
+    if (key === "barangay") {
+      comparison = (a.barangay ?? "Municipality-wide").localeCompare(b.barangay ?? "Municipality-wide");
+    } else if (key === "department") comparison = a.implementingDepartment.localeCompare(b.implementingDepartment);
+    else if (key === "riskLevel") comparison = RISK_ORDER[a.riskLevel] - RISK_ORDER[b.riskLevel];
+    else if (key === "budget" || key === "physicalProgress" || key === "financialProgress") {
+      comparison = a[key] - b[key];
+    } else comparison = a[key].localeCompare(b[key]);
+    return comparison * factor;
   });
 }
 
