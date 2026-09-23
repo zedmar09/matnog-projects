@@ -1,5 +1,7 @@
 import { MATNOG_BARANGAYS } from "@/data/barangays";
 
+import { DEFAULT_SCORING_CRITERIA } from "../constants/scoring-criteria";
+
 import type {
   FundingSource,
   Project,
@@ -7,6 +9,7 @@ import type {
   ProjectFundingAllocation,
   ProjectPipelineStatus,
   ProjectRiskLevel,
+  ProjectScoring,
   TechnicalReview,
 } from "../types/project";
 
@@ -98,11 +101,11 @@ function riskFor(stage: ProjectDeliveryStage, slippageDays: number, blockers: nu
 }
 
 function technicalReviewFor(index: number, pipelineStatus: ProjectPipelineStatus): TechnicalReview {
-  const reviewVariant = index % 4;
+  const reviewVariant = index % 5;
   const status: TechnicalReview["status"] =
     pipelineStatus !== "Under Review"
       ? "Pending"
-      : reviewVariant === 0
+      : reviewVariant === 0 || reviewVariant === 3
         ? "Completed"
         : reviewVariant === 1
           ? "For Clarification"
@@ -147,6 +150,41 @@ function technicalReviewFor(index: number, pipelineStatus: ProjectPipelineStatus
           ? "Supporting evidence requires clarification."
           : "",
     })),
+  };
+}
+
+function scoringFor(index: number, review: TechnicalReview): ProjectScoring {
+  const eligible = review.status === "Completed" && review.recommendation === "Advance to Scoring";
+  const variant = index % 4;
+  const status: ProjectScoring["status"] = !eligible
+    ? "Not Started"
+    : variant === 0
+      ? "Finalized"
+      : variant === 2
+        ? "In Progress"
+        : "Not Started";
+
+  return {
+    status,
+    assessor:
+      status === "Not Started"
+        ? "Unassigned"
+        : ["MPDC Carlo M. Fronda", "Engr. Mara D. Reyes", "LGOO Ana P. Santos"][index % 3],
+    notes:
+      status === "Finalized"
+        ? "Weighted assessment completed for inclusion in the municipal priority ranking exercise."
+        : status === "In Progress"
+          ? "Initial criteria assessment is underway."
+          : "",
+    finalizedAt: status === "Finalized" ? isoDate(2026, 8, 21) : null,
+    entries: DEFAULT_SCORING_CRITERIA.map((criterion, criterionIndex) => {
+      const assessed = status === "Finalized" || (status === "In Progress" && criterionIndex < 3);
+      return {
+        criterionId: criterion.id,
+        rating: assessed ? 3 + ((index + criterionIndex) % 3) : null,
+        rationale: assessed ? `Assessment reflects available evidence for ${criterion.label.toLocaleLowerCase()}.` : "",
+      };
+    }),
   };
 }
 
@@ -215,6 +253,8 @@ export function createProjectDummyData(count = 72): Project[] {
             },
           ];
 
+    const technicalReview = technicalReviewFor(index, pipelineStatus);
+
     return {
       id: `project-${String(index).padStart(4, "0")}`,
       code: `MAT-${fiscalYear}-${String(index).padStart(3, "0")}`,
@@ -236,7 +276,8 @@ export function createProjectDummyData(count = 72): Project[] {
       pipelineStatus,
       deliveryStage,
       proposalCompleteness: pipelineStatus === "Draft" ? Math.min(96, 54 + (index % 7) * 7) : 100,
-      technicalReview: technicalReviewFor(index, pipelineStatus),
+      technicalReview,
+      scoring: scoringFor(index, technicalReview),
       priorityRank: index,
       fiscalYear,
       multiYear: index % 8 === 0,

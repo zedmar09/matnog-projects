@@ -42,6 +42,29 @@ export type TechnicalReview = {
   checks: TechnicalReviewCheck[];
 };
 
+export type ScoringStatus = "Not Started" | "In Progress" | "Finalized";
+
+export type ScoringCriterion = {
+  id: string;
+  label: string;
+  description: string;
+  weight: number;
+};
+
+export type ProjectScoreEntry = {
+  criterionId: string;
+  rating: number | null;
+  rationale: string;
+};
+
+export type ProjectScoring = {
+  status: ScoringStatus;
+  assessor: string;
+  notes: string;
+  finalizedAt: string | null;
+  entries: ProjectScoreEntry[];
+};
+
 export type ProjectSortKey =
   | "code"
   | "title"
@@ -118,6 +141,7 @@ export type Project = {
   deliveryStage: ProjectDeliveryStage;
   proposalCompleteness: number;
   technicalReview: TechnicalReview;
+  scoring: ProjectScoring;
   priorityRank: number;
   fiscalYear: string;
   multiYear: boolean;

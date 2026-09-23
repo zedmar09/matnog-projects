@@ -2,12 +2,15 @@
 
 import { create } from "zustand";
 
+import { DEFAULT_SCORING_CRITERIA } from "../constants/scoring-criteria";
 import { createProjectDummyData } from "../data/project-dummy-data";
 import type {
   Project,
   ProjectActivity,
   ProjectPipelineStatus,
   ProjectProposalInput,
+  ProjectScoring,
+  ScoringCriterion,
   TechnicalReview,
 } from "../types/project";
 
@@ -15,11 +18,14 @@ type SafeProjectChanges = Partial<Omit<Project, "id" | "code">>;
 
 type ProjectRegistryState = {
   projects: Project[];
+  scoringCriteria: ScoringCriterion[];
   nextProjectSequence: number;
   addProposal: (input: ProjectProposalInput) => Project;
   updateProject: (id: string, changes: SafeProjectChanges) => Project | undefined;
   transitionProject: (id: string, status: ProjectPipelineStatus, note: string) => Project | undefined;
   saveTechnicalReview: (id: string, review: TechnicalReview) => Project | undefined;
+  saveProjectScoring: (id: string, scoring: ProjectScoring) => Project | undefined;
+  updateScoringCriteria: (criteria: ScoringCriterion[]) => boolean;
   getProjectById: (id: string) => Project | undefined;
   addActivity: (projectId: string, activity: Omit<ProjectActivity, "id">) => ProjectActivity | undefined;
 };
@@ -32,6 +38,7 @@ function today() {
 
 export const useProjectRegistryStore = create<ProjectRegistryState>((set, get) => ({
   projects: initialProjects,
+  scoringCriteria: DEFAULT_SCORING_CRITERIA,
   nextProjectSequence: initialProjects.length + 1,
   addProposal: (input) => {
     const sequence = get().nextProjectSequence;
@@ -59,6 +66,13 @@ export const useProjectRegistryStore = create<ProjectRegistryState>((set, get) =
           ["cost-reasonableness", "Cost estimate reasonableness"],
           ["fund-eligibility", "Fund source eligibility"],
         ].map(([id, label]) => ({ id, label, status: "Not assessed" as const, note: "" })),
+      },
+      scoring: {
+        status: "Not Started",
+        assessor: "Unassigned",
+        notes: "",
+        finalizedAt: null,
+        entries: get().scoringCriteria.map((criterion) => ({ criterionId: criterion.id, rating: null, rationale: "" })),
       },
       priorityRank: get().projects.length + 1,
       appropriation: 0,
@@ -138,6 +152,32 @@ export const useProjectRegistryStore = create<ProjectRegistryState>((set, get) =
     };
     set((state) => ({ projects: state.projects.map((project) => (project.id === id ? updated : project)) }));
     return updated;
+  },
+  saveProjectScoring: (id, scoring) => {
+    const current = get().projects.find((project) => project.id === id);
+    if (!current) return undefined;
+    const date = today();
+    const activity: ProjectActivity = {
+      id: `activity-session-${id}-${current.activities.length + 1}`,
+      date,
+      action: scoring.status === "Finalized" ? "Project score finalized" : "Project scoring updated",
+      actor: scoring.assessor,
+      note: scoring.status === "Finalized" ? "Weighted score finalized for priority ranking." : "Scoring draft saved.",
+    };
+    const updated: Project = {
+      ...current,
+      scoring,
+      lastUpdated: date,
+      activities: [activity, ...current.activities],
+    };
+    set((state) => ({ projects: state.projects.map((project) => (project.id === id ? updated : project)) }));
+    return updated;
+  },
+  updateScoringCriteria: (scoringCriteria) => {
+    const total = scoringCriteria.reduce((sum, criterion) => sum + criterion.weight, 0);
+    if (total !== 100 || scoringCriteria.some((criterion) => criterion.weight <= 0)) return false;
+    set({ scoringCriteria });
+    return true;
   },
   getProjectById: (id) => get().projects.find((project) => project.id === id),
   addActivity: (projectId, input) => {
