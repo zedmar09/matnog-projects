@@ -1,8 +1,8 @@
-# Project Registry Foundation Design
+# Phase 1: Project Data Foundation and Overview
 
 ## Objective
 
-Establish the shared project domain and the first complete operational workspace for the LGU Matnog Project Management System. This phase delivers realistic Zustand-backed project records, the portfolio Overview, the All Projects masterlist, the Project Detail workspace, and Proposal Intake. Later planning, funding, procurement, inspection, closeout, transparency, and audit modules will consume the same project record.
+Establish the shared project domain and the first operational workspace for the LGU Matnog Project Management System. This phase delivers realistic Zustand-backed project records and the portfolio Overview only. The All Projects masterlist, Project Detail workspace, Proposal Intake, and every later lifecycle module are explicitly deferred to separate reviewable phases.
 
 ## Reference conventions
 
@@ -24,10 +24,6 @@ The implementation will follow these patterns:
 src/
   app/
     page.tsx
-    pipeline/
-      all-projects/page.tsx
-      proposal-intake/page.tsx
-    projects/[id]/page.tsx
   data/
     barangays.ts
   features/
@@ -39,9 +35,6 @@ src/
       utils/project-utils.ts
       views/
         portfolio-overview-view.tsx
-        project-masterlist-view.tsx
-        project-detail-view.tsx
-        proposal-intake-view.tsx
   shared/components/ui/
 ```
 
@@ -143,7 +136,11 @@ The root route becomes a portfolio command center scoped by the existing fiscal-
 
 Charts remain simple and decision-oriented. Avoid decorative visualizations.
 
-## All Projects masterlist
+## Deferred phases
+
+The following designs describe the intended consumers of the shared project model, but they are not implementation scope for Phase 1.
+
+### All Projects masterlist
 
 The `/pipeline/all-projects` route becomes the authoritative portfolio list.
 
@@ -174,7 +171,7 @@ Default columns:
 
 The table supports client-side sorting, pagination, 15/25/50 row sizes, sticky headers, horizontally scrollable density, semantic badges, hover state, empty-filter results, and links to project details.
 
-## Project Detail workspace
+### Project Detail workspace
 
 The `/projects/[id]` route presents one project as the single source of operational truth.
 
@@ -199,7 +196,7 @@ The `/projects/[id]` route presents one project as the single source of operatio
 
 Tabs expose meaningful dummy summaries now and become deeper operational views in later phases.
 
-## Proposal Intake
+### Proposal Intake
 
 The `/pipeline/proposal-intake` route provides a production-style multi-step form:
 
@@ -238,12 +235,12 @@ All controls use the existing green palette and Poppins typography. Semantic yel
 
 ## Verification
 
-- Unit tests cover deterministic generation, portfolio aggregation, filtering, sorting, and store mutations.
+- Type checks and production builds verify the typed domain, deterministic generation, portfolio aggregation, and store contract.
 - TypeScript, Biome, and production build pass.
-- Browser checks cover dashboard rendering, filters, sorting, pagination, project navigation, tab switching, proposal validation, draft creation, and submission.
+- Browser checks cover dashboard rendering, top-bar scope changes, panel density, overflow, and narrow-screen behavior.
 - Desktop and narrow-screen layouts remain usable.
 - No native `<select>` elements are introduced.
 
 ## Completion criteria
 
-This phase is complete when a user can review the portfolio from Overview, find and filter projects in All Projects, open a realistic multi-tab Project Detail record, create or submit a proposal, and see the new session record reflected everywhere through Zustand.
+This phase is complete when a user can review a realistic, scope-aware portfolio from Overview and the project records are available through a typed session-only Zustand store for later phases. No later lifecycle screen is included in this completion criterion.
