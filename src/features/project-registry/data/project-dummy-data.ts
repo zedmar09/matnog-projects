@@ -4,6 +4,7 @@ import { DEFAULT_SCORING_CRITERIA } from "../constants/scoring-criteria";
 
 import type {
   DuplicateReviewRecord,
+  FundingHandoffRecord,
   FundingSource,
   PriorityRankingRecord,
   Project,
@@ -271,6 +272,36 @@ function duplicateReviewFor(
   };
 }
 
+function fundingHandoffFor(index: number, pipelineStatus: ProjectPipelineStatus): FundingHandoffRecord {
+  if (pipelineStatus === "Funded") {
+    return {
+      status: "Ready for Funding Review",
+      assignedOffice: "Municipal Budget Office",
+      note: "Portfolio requirements were endorsed to funding planning for source validation.",
+      updatedBy: "Municipal Planning and Development Office",
+      updatedAt: isoDate(2026, 8, 23),
+    };
+  }
+  if (pipelineStatus !== "Prioritized") {
+    return { status: "Not Started", assignedOffice: "Unassigned", note: "", updatedBy: "Unassigned", updatedAt: null };
+  }
+  const status: FundingHandoffRecord["status"] =
+    index % 4 === 0 ? "For Fund Validation" : index % 4 === 2 ? "Ready for Funding Review" : "Not Started";
+  return {
+    status,
+    assignedOffice:
+      status === "Not Started" ? "Unassigned" : index % 2 ? "Municipal Budget Office" : "Local Finance Committee",
+    note:
+      status === "Not Started"
+        ? ""
+        : status === "Ready for Funding Review"
+          ? "Plan linkage and proposed funding sources are ready for detailed fiscal review."
+          : "Validate fund eligibility and available fiscal space before endorsement.",
+    updatedBy: status === "Not Started" ? "Unassigned" : "Municipal Planning and Development Office",
+    updatedAt: status === "Not Started" ? null : isoDate(2026, 8, 23),
+  };
+}
+
 export function createProjectDummyData(count = 72): Project[] {
   seed = 614_2026;
 
@@ -364,6 +395,7 @@ export function createProjectDummyData(count = 72): Project[] {
       scoring,
       priorityRanking: priorityRankingFor(index, pipelineStatus, scoring),
       duplicateReview: duplicateReviewFor(index, count, pipelineStatus),
+      fundingHandoff: fundingHandoffFor(index, pipelineStatus),
       priorityRank: index,
       fiscalYear,
       multiYear: index % 8 === 0,

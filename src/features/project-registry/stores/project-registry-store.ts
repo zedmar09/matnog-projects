@@ -6,6 +6,7 @@ import { DEFAULT_SCORING_CRITERIA } from "../constants/scoring-criteria";
 import { createProjectDummyData } from "../data/project-dummy-data";
 import type {
   DuplicateReviewRecord,
+  FundingHandoffRecord,
   PriorityRankingRecord,
   Project,
   ProjectActivity,
@@ -30,6 +31,7 @@ type ProjectRegistryState = {
   savePriorityDecision: (id: string, ranking: PriorityRankingRecord) => Project | undefined;
   publishPriorityRanking: (ids: string[]) => number;
   saveDuplicateReview: (id: string, review: DuplicateReviewRecord) => Project | undefined;
+  saveFundingHandoff: (id: string, handoff: FundingHandoffRecord) => Project | undefined;
   updateScoringCriteria: (criteria: ScoringCriterion[]) => boolean;
   getProjectById: (id: string) => Project | undefined;
   addActivity: (projectId: string, activity: Omit<ProjectActivity, "id">) => ProjectActivity | undefined;
@@ -95,6 +97,13 @@ export const useProjectRegistryStore = create<ProjectRegistryState>((set, get) =
         reviewer: "Unassigned",
         note: "",
         reviewedAt: null,
+      },
+      fundingHandoff: {
+        status: "Not Started",
+        assignedOffice: "Unassigned",
+        note: "",
+        updatedBy: "Unassigned",
+        updatedAt: null,
       },
       priorityRank: get().projects.length + 1,
       appropriation: 0,
@@ -260,6 +269,26 @@ export const useProjectRegistryStore = create<ProjectRegistryState>((set, get) =
       ...current,
       duplicateReview,
       pipelineStatus,
+      lastUpdated: date,
+      activities: [activity, ...current.activities],
+    };
+    set((state) => ({ projects: state.projects.map((project) => (project.id === id ? updated : project)) }));
+    return updated;
+  },
+  saveFundingHandoff: (id, fundingHandoff) => {
+    const current = get().projects.find((project) => project.id === id);
+    if (!current) return undefined;
+    const date = today();
+    const activity: ProjectActivity = {
+      id: `activity-session-${id}-${current.activities.length + 1}`,
+      date,
+      action: "Funding planning handoff updated",
+      actor: fundingHandoff.updatedBy,
+      note: `${fundingHandoff.status}. ${fundingHandoff.note}`,
+    };
+    const updated: Project = {
+      ...current,
+      fundingHandoff,
       lastUpdated: date,
       activities: [activity, ...current.activities],
     };

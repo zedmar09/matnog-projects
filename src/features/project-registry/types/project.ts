@@ -95,6 +95,20 @@ export type DuplicateReviewRecord = {
   reviewedAt: string | null;
 };
 
+export type FundingHandoffStatus =
+  | "Not Started"
+  | "For Fund Validation"
+  | "Ready for Funding Review"
+  | "Returned for Portfolio Review";
+
+export type FundingHandoffRecord = {
+  status: FundingHandoffStatus;
+  assignedOffice: string;
+  note: string;
+  updatedBy: string;
+  updatedAt: string | null;
+};
+
 export type ProjectSortKey =
   | "code"
   | "title"
@@ -174,6 +188,7 @@ export type Project = {
   scoring: ProjectScoring;
   priorityRanking: PriorityRankingRecord;
   duplicateReview: DuplicateReviewRecord;
+  fundingHandoff: FundingHandoffRecord;
   priorityRank: number;
   fiscalYear: string;
   multiYear: boolean;
