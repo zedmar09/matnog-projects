@@ -4,6 +4,7 @@ import {
   Bell,
   CalendarDays,
   ChevronDown,
+  ChevronRight,
   CircleUserRound,
   Landmark,
   LogOut,
@@ -26,7 +27,7 @@ import { useEffect, useRef, useState } from "react";
 import { type JurisdictionScope, useShellStore } from "@/stores/shell-store";
 
 import styles from "./app-shell.module.css";
-import { NAVIGATION_SECTIONS } from "./navigation";
+import { getNavigationLabel, NAVIGATION_SECTIONS } from "./navigation";
 
 const FISCAL_YEARS = ["2026", "2025", "2024"];
 
@@ -40,6 +41,12 @@ const JURISDICTIONS: Array<{ value: JurisdictionScope; label: string }> = [
 
 function Sidebar() {
   const pathname = usePathname();
+  const [openModules, setOpenModules] = useState<Set<string>>(() => {
+    const activeModule = NAVIGATION_SECTIONS.flatMap((section) => section.items).find((item) =>
+      item.children?.some((child) => child.href === pathname),
+    );
+    return activeModule ? new Set([activeModule.label]) : new Set();
+  });
   const collapsed = useShellStore((state) => state.sidebarCollapsed);
   const mobileOpen = useShellStore((state) => state.mobileSidebarOpen);
   const toggleSidebar = useShellStore((state) => state.toggleSidebar);
@@ -95,12 +102,60 @@ function Sidebar() {
               <div className={styles.navItems}>
                 {section.items.map((item) => {
                   const active = pathname === item.href;
+                  const childActive = item.children?.some((child) => child.href === pathname) ?? false;
+                  const expanded = openModules.has(item.label);
                   const Icon = item.icon;
+
+                  if (item.children?.length) {
+                    return (
+                      <div className={styles.navModule} key={item.label}>
+                        <button
+                          className={`${styles.navParent} ${childActive ? styles.navParentActive : ""} ${item.emphasis === "alert" ? styles.navParentAlert : ""}`}
+                          type="button"
+                          title={collapsed ? item.label : undefined}
+                          aria-expanded={expanded}
+                          onClick={() => {
+                            if (collapsed) toggleSidebar();
+                            setOpenModules((current) => {
+                              const next = new Set(current);
+                              if (next.has(item.label)) next.delete(item.label);
+                              else next.add(item.label);
+                              return next;
+                            });
+                          }}
+                        >
+                          <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
+                          <span>{item.label}</span>
+                          {item.emphasis === "alert" ? <i className={styles.alertDot} aria-hidden="true" /> : null}
+                          <ChevronRight className={styles.moduleChevron} size={14} aria-hidden="true" />
+                        </button>
+                        {expanded ? (
+                          <div className={styles.navChildren}>
+                            {item.children.map((child) => {
+                              const current = pathname === child.href;
+                              return (
+                                <Link
+                                  className={current ? styles.navChildActive : ""}
+                                  href={child.href}
+                                  key={child.href}
+                                  aria-current={current ? "page" : undefined}
+                                  onClick={() => setMobileOpen(false)}
+                                >
+                                  {child.label}
+                                </Link>
+                              );
+                            })}
+                          </div>
+                        ) : null}
+                      </div>
+                    );
+                  }
+
                   return (
                     <Link
                       className={`${styles.navItem} ${active ? styles.navItemActive : ""}`}
-                      href={item.href}
-                      key={item.href}
+                      href={item.href ?? "/"}
+                      key={item.label}
                       title={collapsed ? item.label : undefined}
                       aria-current={active ? "page" : undefined}
                       onClick={() => setMobileOpen(false)}
@@ -133,6 +188,7 @@ function Sidebar() {
 }
 
 function TopNavigation() {
+  const pathname = usePathname();
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
   const setMobileOpen = useShellStore((state) => state.setMobileSidebarOpen);
@@ -163,7 +219,7 @@ function TopNavigation() {
         </button>
         <div>
           <span>Project workspace</span>
-          <h1>Overview</h1>
+          <h1>{getNavigationLabel(pathname)}</h1>
         </div>
       </div>
 
