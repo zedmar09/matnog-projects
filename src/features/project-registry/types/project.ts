@@ -75,6 +75,26 @@ export type PriorityRankingRecord = {
   publishedAt: string | null;
 };
 
+export type DuplicateReviewStatus = "Pending Review" | "In Review" | "Cleared" | "Resolved";
+
+export type DuplicateReviewOutcome =
+  | "Pending"
+  | "No Conflict"
+  | "Related - Coordinate"
+  | "Consolidate"
+  | "Confirmed Duplicate";
+
+export type DuplicateReviewRecord = {
+  matchedProjectId: string | null;
+  confidence: number;
+  signals: string[];
+  status: DuplicateReviewStatus;
+  outcome: DuplicateReviewOutcome;
+  reviewer: string;
+  note: string;
+  reviewedAt: string | null;
+};
+
 export type ProjectSortKey =
   | "code"
   | "title"
@@ -153,6 +173,7 @@ export type Project = {
   technicalReview: TechnicalReview;
   scoring: ProjectScoring;
   priorityRanking: PriorityRankingRecord;
+  duplicateReview: DuplicateReviewRecord;
   priorityRank: number;
   fiscalYear: string;
   multiYear: boolean;

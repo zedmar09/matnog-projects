@@ -5,6 +5,7 @@ import { create } from "zustand";
 import { DEFAULT_SCORING_CRITERIA } from "../constants/scoring-criteria";
 import { createProjectDummyData } from "../data/project-dummy-data";
 import type {
+  DuplicateReviewRecord,
   PriorityRankingRecord,
   Project,
   ProjectActivity,
@@ -28,6 +29,7 @@ type ProjectRegistryState = {
   saveProjectScoring: (id: string, scoring: ProjectScoring) => Project | undefined;
   savePriorityDecision: (id: string, ranking: PriorityRankingRecord) => Project | undefined;
   publishPriorityRanking: (ids: string[]) => number;
+  saveDuplicateReview: (id: string, review: DuplicateReviewRecord) => Project | undefined;
   updateScoringCriteria: (criteria: ScoringCriterion[]) => boolean;
   getProjectById: (id: string) => Project | undefined;
   addActivity: (projectId: string, activity: Omit<ProjectActivity, "id">) => ProjectActivity | undefined;
@@ -83,6 +85,16 @@ export const useProjectRegistryStore = create<ProjectRegistryState>((set, get) =
         decidedBy: "Unassigned",
         decidedAt: null,
         publishedAt: null,
+      },
+      duplicateReview: {
+        matchedProjectId: null,
+        confidence: 0,
+        signals: [],
+        status: "Pending Review",
+        outcome: "Pending",
+        reviewer: "Unassigned",
+        note: "",
+        reviewedAt: null,
       },
       priorityRank: get().projects.length + 1,
       appropriation: 0,
@@ -228,6 +240,31 @@ export const useProjectRegistryStore = create<ProjectRegistryState>((set, get) =
       }),
     }));
     return published;
+  },
+  saveDuplicateReview: (id, duplicateReview) => {
+    const current = get().projects.find((project) => project.id === id);
+    if (!current) return undefined;
+    const date = today();
+    const shouldDefer = duplicateReview.outcome === "Consolidate" || duplicateReview.outcome === "Confirmed Duplicate";
+    const pipelineStatus = shouldDefer ? ("Deferred" as const) : current.pipelineStatus;
+    const activity: ProjectActivity = {
+      id: `activity-session-${id}-${current.activities.length + 1}`,
+      date,
+      action: "Duplicate and overlap review completed",
+      actor: duplicateReview.reviewer,
+      note: shouldDefer
+        ? `${duplicateReview.outcome}. Project moved to Deferred pending portfolio action.`
+        : `${duplicateReview.outcome}. Project remains in its current pipeline stage.`,
+    };
+    const updated: Project = {
+      ...current,
+      duplicateReview,
+      pipelineStatus,
+      lastUpdated: date,
+      activities: [activity, ...current.activities],
+    };
+    set((state) => ({ projects: state.projects.map((project) => (project.id === id ? updated : project)) }));
+    return updated;
   },
   updateScoringCriteria: (scoringCriteria) => {
     const total = scoringCriteria.reduce((sum, criterion) => sum + criterion.weight, 0);

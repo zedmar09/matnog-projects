@@ -3,6 +3,7 @@ import { MATNOG_BARANGAYS } from "@/data/barangays";
 import { DEFAULT_SCORING_CRITERIA } from "../constants/scoring-criteria";
 
 import type {
+  DuplicateReviewRecord,
   FundingSource,
   PriorityRankingRecord,
   Project,
@@ -212,6 +213,64 @@ function priorityRankingFor(
   };
 }
 
+function duplicateReviewFor(
+  index: number,
+  count: number,
+  pipelineStatus: ProjectPipelineStatus,
+): DuplicateReviewRecord {
+  const reviewable = pipelineStatus === "Prioritized" || (pipelineStatus === "Deferred" && index <= 40);
+  const pairedIndex = index > 40 ? index - 40 : index + 40 <= count ? index + 40 : null;
+  if (!reviewable || !pairedIndex) {
+    return {
+      matchedProjectId: null,
+      confidence: 0,
+      signals: [],
+      status: "Pending Review",
+      outcome: "Pending",
+      reviewer: "Unassigned",
+      note: "",
+      reviewedAt: null,
+    };
+  }
+
+  const variant = index % 4;
+  const isDeferredDuplicate = pipelineStatus === "Deferred" && variant < 2;
+  const status: DuplicateReviewRecord["status"] = isDeferredDuplicate
+    ? "Resolved"
+    : variant === 0
+      ? "Pending Review"
+      : variant === 1
+        ? "In Review"
+        : "Cleared";
+  const outcome: DuplicateReviewRecord["outcome"] = isDeferredDuplicate
+    ? "Confirmed Duplicate"
+    : status === "Cleared"
+      ? variant === 2
+        ? "No Conflict"
+        : "Related - Coordinate"
+      : "Pending";
+
+  return {
+    matchedProjectId: `project-${String(pairedIndex).padStart(4, "0")}`,
+    confidence: 86 + ((index * 3) % 13),
+    signals: ["Similar project title and type", "Same implementing department", "Overlapping service outcome"],
+    status,
+    outcome,
+    reviewer: status === "Pending Review" ? "Unassigned" : "Municipal Planning and Development Office",
+    note:
+      outcome === "Confirmed Duplicate"
+        ? "Scope substantially duplicates an existing project serving the same location and intended beneficiaries."
+        : outcome === "No Conflict"
+          ? "Projects address distinct work packages and may proceed independently."
+          : outcome === "Related - Coordinate"
+            ? "Related scopes should share implementation sequencing and site coordination."
+            : status === "In Review"
+              ? "Reviewing scope boundaries and beneficiary coverage with the implementing offices."
+              : "",
+    reviewedAt: status === "Cleared" || status === "Resolved" ? isoDate(2026, 8, 23) : null,
+  };
+}
+
 export function createProjectDummyData(count = 72): Project[] {
   seed = 614_2026;
 
@@ -304,6 +363,7 @@ export function createProjectDummyData(count = 72): Project[] {
       technicalReview,
       scoring,
       priorityRanking: priorityRankingFor(index, pipelineStatus, scoring),
+      duplicateReview: duplicateReviewFor(index, count, pipelineStatus),
       priorityRank: index,
       fiscalYear,
       multiYear: index % 8 === 0,
