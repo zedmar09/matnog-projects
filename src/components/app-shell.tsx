@@ -21,7 +21,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
-
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
 import { type JurisdictionScope, useShellStore } from "@/stores/shell-store";
 
 import styles from "./app-shell.module.css";
@@ -218,31 +218,36 @@ function TopNavigation() {
       </label>
 
       <div className={styles.topbarActions}>
-        <label className={styles.compactSelect}>
-          <CalendarDays size={16} aria-hidden="true" />
-          <span className={styles.srOnly}>Fiscal year</span>
-          <select value={fiscalYear} onChange={(event) => setFiscalYear(event.target.value)}>
+        <Select value={fiscalYear} onValueChange={setFiscalYear}>
+          <SelectTrigger className={styles.compactSelect} aria-label="Fiscal year">
+            <CalendarDays size={16} aria-hidden="true" />
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent align="end">
             {FISCAL_YEARS.map((year) => (
-              <option key={year} value={year}>
+              <SelectItem key={year} value={year}>
                 FY {year}
-              </option>
+              </SelectItem>
             ))}
-          </select>
-          <ChevronDown size={14} aria-hidden="true" />
-        </label>
+          </SelectContent>
+        </Select>
 
-        <label className={`${styles.compactSelect} ${styles.jurisdictionSelect}`}>
-          <MapPin size={16} aria-hidden="true" />
-          <span className={styles.srOnly}>Jurisdiction scope</span>
-          <select value={jurisdiction} onChange={(event) => setJurisdiction(event.target.value as JurisdictionScope)}>
+        <Select value={jurisdiction} onValueChange={(value) => setJurisdiction(value as JurisdictionScope)}>
+          <SelectTrigger
+            className={`${styles.compactSelect} ${styles.jurisdictionSelect}`}
+            aria-label="Jurisdiction scope"
+          >
+            <MapPin size={16} aria-hidden="true" />
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent align="end">
             {JURISDICTIONS.map((scope) => (
-              <option key={scope.value} value={scope.value}>
+              <SelectItem key={scope.value} value={scope.value}>
                 {scope.label}
-              </option>
+              </SelectItem>
             ))}
-          </select>
-          <ChevronDown size={14} aria-hidden="true" />
-        </label>
+          </SelectContent>
+        </Select>
 
         <button className={styles.iconButton} type="button" aria-label="Notifications">
           <Bell size={18} />
