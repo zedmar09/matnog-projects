@@ -162,6 +162,7 @@ export function createProjectDummyData(count = 72): Project[] {
       beneficiarySectors: index % 4 === 0 ? ["Families", "Senior citizens", "PWD"] : ["Families", "Local workers"],
       pipelineStatus,
       deliveryStage,
+      proposalCompleteness: pipelineStatus === "Draft" ? Math.min(96, 54 + (index % 7) * 7) : 100,
       priorityRank: index,
       fiscalYear,
       multiYear: index % 9 === 0,

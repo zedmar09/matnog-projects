@@ -93,6 +93,7 @@ export type Project = {
   beneficiarySectors: string[];
   pipelineStatus: ProjectPipelineStatus;
   deliveryStage: ProjectDeliveryStage;
+  proposalCompleteness: number;
   priorityRank: number;
   fiscalYear: string;
   multiYear: boolean;

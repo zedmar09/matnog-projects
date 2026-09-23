@@ -36,6 +36,7 @@ export const useProjectRegistryStore = create<ProjectRegistryState>((set, get) =
       code: `MAT-${input.fiscalYear}-${String(sequence).padStart(3, "0")}`,
       pipelineStatus,
       deliveryStage: "Planning",
+      proposalCompleteness: 100,
       priorityRank: get().projects.length + 1,
       appropriation: 0,
       obligation: 0,
