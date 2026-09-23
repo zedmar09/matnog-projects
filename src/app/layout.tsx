@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Poppins } from "next/font/google";
 
 import { AppShell } from "@/components/app-shell";
 
 import "./globals.css";
 
-const geist = Geist({
+const poppins = Poppins({
   subsets: ["latin"],
-  variable: "--font-geist",
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-poppins",
 });
 
 export const metadata: Metadata = {
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className={geist.variable}>
+      <body className={poppins.variable}>
         <AppShell>{children}</AppShell>
       </body>
     </html>

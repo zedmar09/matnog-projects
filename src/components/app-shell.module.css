@@ -51,7 +51,7 @@
   flex: 0 0 36px;
   place-items: center;
   color: #fff;
-  background: #f47a24;
+  background: #159488;
   border-radius: 10px;
   box-shadow: inset 0 0 0 1px rgb(255 255 255 / 18%);
 }
@@ -99,8 +99,8 @@
   height: 28px;
   flex: 0 0 28px;
   place-items: center;
-  color: #f6a05f;
-  background: rgb(244 122 36 / 12%);
+  color: #6ec6bd;
+  background: rgb(21 148 136 / 13%);
   border-radius: 7px;
 }
 
@@ -178,7 +178,7 @@
 
 .navItemActive {
   color: #fff;
-  background: rgb(244 122 36 / 15%);
+  background: rgb(21 148 136 / 16%);
 }
 
 .navItemActive::before {
@@ -188,12 +188,12 @@
   width: 3px;
   height: 22px;
   content: "";
-  background: #f47a24;
+  background: #159488;
   border-radius: 0 3px 3px 0;
 }
 
 .navItemActive svg {
-  color: #f6a05f;
+  color: #6ec6bd;
 }
 
 .navModule {
@@ -217,7 +217,7 @@
 }
 
 .navParentActive > svg:first-child {
-  color: #f6a05f;
+  color: #6ec6bd;
 }
 
 .navParentAlert > svg:first-child {
@@ -228,7 +228,7 @@
   width: 6px;
   height: 6px;
   flex: 0 0 6px;
-  background: #f47a24;
+  background: #159488;
   border-radius: 50%;
 }
 
@@ -269,7 +269,7 @@
 
 .navChildren .navChildActive {
   color: #fff;
-  background: rgb(244 122 36 / 14%);
+  background: rgb(21 148 136 / 15%);
 }
 
 .navChildren .navChildActive::before {
@@ -279,7 +279,7 @@
   width: 5px;
   height: 5px;
   content: "";
-  background: #f47a24;
+  background: #159488;
   border-radius: 50%;
   transform: translateY(-50%);
 }
@@ -353,8 +353,8 @@
 
 .searchBox:focus-within {
   background: #fff;
-  border-color: #d6a27b;
-  box-shadow: 0 0 0 3px rgb(244 122 36 / 10%);
+  border-color: #70b9b2;
+  box-shadow: 0 0 0 3px rgb(21 148 136 / 11%);
 }
 
 .searchBox input {
@@ -442,7 +442,7 @@
   right: 7px;
   width: 6px;
   height: 6px;
-  background: #f47a24;
+  background: #159488;
   border: 1.5px solid #fff;
   border-radius: 50%;
 }
@@ -476,9 +476,9 @@
   height: 32px;
   flex: 0 0 32px;
   place-items: center;
-  color: #bc5a18;
-  background: #fff0e6;
-  border: 1px solid #f6d3ba;
+  color: #117d74;
+  background: #edf6f4;
+  border: 1px solid #cde5e1;
   border-radius: 9px;
 }
 

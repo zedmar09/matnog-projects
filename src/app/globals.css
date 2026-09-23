@@ -2,8 +2,8 @@
   color-scheme: light;
   --ink: #202124;
   --ink-soft: #292a2e;
-  --orange: #f47a24;
-  --orange-strong: #e8640e;
+  --green: #159488;
+  --green-strong: #117d74;
   --canvas: #f4f5f6;
   --surface: #ffffff;
   --border: #e6e7e9;
@@ -28,7 +28,7 @@ body {
   margin: 0;
   color: var(--text);
   background: var(--canvas);
-  font-family: var(--font-geist), Arial, sans-serif;
+  font-family: var(--font-poppins), Arial, sans-serif;
   text-rendering: optimizeLegibility;
 }
 
@@ -52,12 +52,11 @@ button:focus-visible,
 input:focus-visible,
 select:focus-visible,
 a:focus-visible {
-  outline: 3px solid rgb(244 122 36 / 42%);
+  outline: 3px solid rgb(21 148 136 / 38%);
   outline-offset: 2px;
 }
 
 ::selection {
   color: #fff;
-  background: var(--orange-strong);
+  background: var(--green-strong);
 }
-
