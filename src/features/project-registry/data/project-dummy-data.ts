@@ -7,6 +7,7 @@ import type {
   ProjectFundingAllocation,
   ProjectPipelineStatus,
   ProjectRiskLevel,
+  TechnicalReview,
 } from "../types/project";
 
 const projectTemplates = [
@@ -64,6 +65,15 @@ const contractors = [
   "Pacificline General Services",
 ];
 
+const technicalReviewCriteria = [
+  ["completeness", "Proposal completeness"],
+  ["plan-linkage", "CDP, LDIP, and AIP linkage"],
+  ["technical-feasibility", "Technical feasibility"],
+  ["site-readiness", "Site and right-of-way readiness"],
+  ["cost-reasonableness", "Cost estimate reasonableness"],
+  ["fund-eligibility", "Fund source eligibility"],
+] as const;
+
 let seed = 614_2026;
 
 function random() {
@@ -85,6 +95,59 @@ function riskFor(stage: ProjectDeliveryStage, slippageDays: number, blockers: nu
   if (slippageDays >= 25 || blockers >= 3) return "High";
   if (slippageDays > 0 || blockers > 0) return "Moderate";
   return "Low";
+}
+
+function technicalReviewFor(index: number, pipelineStatus: ProjectPipelineStatus): TechnicalReview {
+  const reviewVariant = index % 4;
+  const status: TechnicalReview["status"] =
+    pipelineStatus !== "Under Review"
+      ? "Pending"
+      : reviewVariant === 0
+        ? "Completed"
+        : reviewVariant === 1
+          ? "For Clarification"
+          : reviewVariant === 2
+            ? "In Review"
+            : "Pending";
+  const concernIndex = index % technicalReviewCriteria.length;
+
+  return {
+    status,
+    reviewer:
+      status === "Pending"
+        ? "Unassigned"
+        : ["Engr. Mara D. Reyes", "MPDC Carlo M. Fronda", "LGOO Ana P. Santos"][index % 3],
+    dueDate: isoDate(2026, 8, 18 + (index % 10)),
+    recommendation:
+      status === "Completed" ? "Advance to Scoring" : status === "For Clarification" ? "Request Clarification" : null,
+    notes:
+      status === "Completed"
+        ? "Technical requirements reviewed. Proposal may proceed to the scoring workspace."
+        : status === "For Clarification"
+          ? "Request supporting details for the item marked as a concern before completing review."
+          : status === "In Review"
+            ? "Initial technical validation is in progress."
+            : "",
+    completedAt: status === "Completed" ? isoDate(2026, 8, 20 + (index % 3)) : null,
+    checks: technicalReviewCriteria.map(([id, label], criterionIndex) => ({
+      id,
+      label,
+      status:
+        status === "Completed"
+          ? "Pass"
+          : status === "For Clarification" && criterionIndex === concernIndex
+            ? "Concern"
+            : status === "For Clarification" || status === "In Review"
+              ? criterionIndex <= index % technicalReviewCriteria.length
+                ? "Pass"
+                : "Not assessed"
+              : "Not assessed",
+      note:
+        status === "For Clarification" && criterionIndex === concernIndex
+          ? "Supporting evidence requires clarification."
+          : "",
+    })),
+  };
 }
 
 export function createProjectDummyData(count = 72): Project[] {
@@ -173,6 +236,7 @@ export function createProjectDummyData(count = 72): Project[] {
       pipelineStatus,
       deliveryStage,
       proposalCompleteness: pipelineStatus === "Draft" ? Math.min(96, 54 + (index % 7) * 7) : 100,
+      technicalReview: technicalReviewFor(index, pipelineStatus),
       priorityRank: index,
       fiscalYear,
       multiYear: index % 8 === 0,

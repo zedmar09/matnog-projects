@@ -19,6 +19,29 @@ export type ProjectDeliveryStage =
 
 export type ProjectRiskLevel = "Low" | "Moderate" | "High" | "Critical";
 
+export type TechnicalReviewStatus = "Pending" | "In Review" | "For Clarification" | "Completed";
+
+export type TechnicalReviewCheckStatus = "Not assessed" | "Pass" | "Concern";
+
+export type TechnicalReviewRecommendation = "Advance to Scoring" | "Request Clarification" | "Not Recommended";
+
+export type TechnicalReviewCheck = {
+  id: string;
+  label: string;
+  status: TechnicalReviewCheckStatus;
+  note: string;
+};
+
+export type TechnicalReview = {
+  status: TechnicalReviewStatus;
+  reviewer: string;
+  dueDate: string;
+  recommendation: TechnicalReviewRecommendation | null;
+  notes: string;
+  completedAt: string | null;
+  checks: TechnicalReviewCheck[];
+};
+
 export type ProjectSortKey =
   | "code"
   | "title"
@@ -94,6 +117,7 @@ export type Project = {
   pipelineStatus: ProjectPipelineStatus;
   deliveryStage: ProjectDeliveryStage;
   proposalCompleteness: number;
+  technicalReview: TechnicalReview;
   priorityRank: number;
   fiscalYear: string;
   multiYear: boolean;

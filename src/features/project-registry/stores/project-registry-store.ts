@@ -3,7 +3,13 @@
 import { create } from "zustand";
 
 import { createProjectDummyData } from "../data/project-dummy-data";
-import type { Project, ProjectActivity, ProjectPipelineStatus, ProjectProposalInput } from "../types/project";
+import type {
+  Project,
+  ProjectActivity,
+  ProjectPipelineStatus,
+  ProjectProposalInput,
+  TechnicalReview,
+} from "../types/project";
 
 type SafeProjectChanges = Partial<Omit<Project, "id" | "code">>;
 
@@ -13,6 +19,7 @@ type ProjectRegistryState = {
   addProposal: (input: ProjectProposalInput) => Project;
   updateProject: (id: string, changes: SafeProjectChanges) => Project | undefined;
   transitionProject: (id: string, status: ProjectPipelineStatus, note: string) => Project | undefined;
+  saveTechnicalReview: (id: string, review: TechnicalReview) => Project | undefined;
   getProjectById: (id: string) => Project | undefined;
   addActivity: (projectId: string, activity: Omit<ProjectActivity, "id">) => ProjectActivity | undefined;
 };
@@ -37,6 +44,22 @@ export const useProjectRegistryStore = create<ProjectRegistryState>((set, get) =
       pipelineStatus,
       deliveryStage: "Planning",
       proposalCompleteness: 100,
+      technicalReview: {
+        status: "Pending",
+        reviewer: "Unassigned",
+        dueDate: date,
+        recommendation: null,
+        notes: "",
+        completedAt: null,
+        checks: [
+          ["completeness", "Proposal completeness"],
+          ["plan-linkage", "CDP, LDIP, and AIP linkage"],
+          ["technical-feasibility", "Technical feasibility"],
+          ["site-readiness", "Site and right-of-way readiness"],
+          ["cost-reasonableness", "Cost estimate reasonableness"],
+          ["fund-eligibility", "Fund source eligibility"],
+        ].map(([id, label]) => ({ id, label, status: "Not assessed" as const, note: "" })),
+      },
       priorityRank: get().projects.length + 1,
       appropriation: 0,
       obligation: 0,
@@ -90,6 +113,26 @@ export const useProjectRegistryStore = create<ProjectRegistryState>((set, get) =
     const updated = {
       ...current,
       pipelineStatus,
+      lastUpdated: date,
+      activities: [activity, ...current.activities],
+    };
+    set((state) => ({ projects: state.projects.map((project) => (project.id === id ? updated : project)) }));
+    return updated;
+  },
+  saveTechnicalReview: (id, technicalReview) => {
+    const current = get().projects.find((project) => project.id === id);
+    if (!current) return undefined;
+    const date = today();
+    const activity: ProjectActivity = {
+      id: `activity-session-${id}-${current.activities.length + 1}`,
+      date,
+      action: technicalReview.status === "Completed" ? "Technical review completed" : "Technical review updated",
+      actor: technicalReview.reviewer,
+      note: technicalReview.recommendation ?? "Technical review details saved.",
+    };
+    const updated: Project = {
+      ...current,
+      technicalReview,
       lastUpdated: date,
       activities: [activity, ...current.activities],
     };
