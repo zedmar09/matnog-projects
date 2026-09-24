@@ -113,9 +113,7 @@ export function FundSourceRegistryView() {
       sources.filter((source) => {
         if (jurisdiction === "municipal") return true;
         if (jurisdiction === "all-barangays") return source.ownership === "Barangay";
-        const target =
-          jurisdiction === "poblacion" ? "Poblacion" : jurisdiction === "gadgaron" ? "Gadgaron" : "Sinalmacan";
-        return source.ownership === "Municipal" || source.barangay === target;
+        return source.ownership === "Municipal" || source.barangay === jurisdiction;
       }),
     [sources, jurisdiction],
   );
