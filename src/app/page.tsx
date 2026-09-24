@@ -1,5 +1,5 @@
-import { PortfolioOverviewView } from "@/features/project-registry/views/portfolio-overview-view";
+import { DashboardView } from "@/features/dashboard/views/dashboard-view";
 
-export default function OverviewPage() {
-  return <PortfolioOverviewView />;
+export default function DashboardPage() {
+  return <DashboardView />;
 }

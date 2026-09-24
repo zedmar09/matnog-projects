@@ -30,12 +30,6 @@ const PIPELINE_ORDER: ProjectPipelineStatus[] = [
   "Rejected",
 ];
 
-const JURISDICTION_NAMES: Record<Exclude<JurisdictionScope, "municipal" | "all-barangays">, string> = {
-  poblacion: "Poblacion",
-  gadgaron: "Gadgaron",
-  sinalmacan: "Sinalmacan",
-};
-
 export function formatCompactCurrency(value: number) {
   if (value >= 1_000_000_000) return `₱${Number((value / 1_000_000_000).toFixed(1))}B`;
   if (value >= 1_000_000) {
@@ -67,7 +61,7 @@ export function filterProjectsByScope(projects: Project[], fiscalYear: string, j
     if (project.fiscalYear !== fiscalYear) return false;
     if (jurisdiction === "municipal") return true;
     if (jurisdiction === "all-barangays") return project.barangay !== null;
-    return project.barangay === JURISDICTION_NAMES[jurisdiction] || project.barangay === null;
+    return project.barangay === jurisdiction || project.barangay === null;
   });
 }
 

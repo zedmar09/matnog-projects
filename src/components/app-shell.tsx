@@ -11,7 +11,6 @@ import {
   Menu,
   PanelLeftClose,
   PanelLeftOpen,
-  Search,
   Settings,
   SunMedium,
   UserRound,
@@ -21,6 +20,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
+import { MATNOG_BARANGAYS } from "@/data/barangays";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
 import { type JurisdictionScope, useShellStore } from "@/stores/shell-store";
 
@@ -32,18 +32,17 @@ const FISCAL_YEARS = ["2026", "2025", "2024"];
 const JURISDICTIONS: Array<{ value: JurisdictionScope; label: string }> = [
   { value: "municipal", label: "Municipality-wide" },
   { value: "all-barangays", label: "All barangays" },
-  { value: "poblacion", label: "Poblacion" },
-  { value: "gadgaron", label: "Gadgaron" },
-  { value: "sinalmacan", label: "Sinalmacan" },
+  ...MATNOG_BARANGAYS.map((name) => ({ value: name as JurisdictionScope, label: name })),
 ];
 
 function Sidebar() {
   const pathname = usePathname();
   const [openModules, setOpenModules] = useState<Set<string>>(() => {
-    const activeModule = NAVIGATION_SECTIONS.flatMap((section) => section.items).find((item) =>
-      item.children?.some((child) => child.href === pathname),
+    return new Set(
+      NAVIGATION_SECTIONS.flatMap((section) => section.items)
+        .filter((item) => item.children?.length)
+        .map((item) => item.label),
     );
-    return activeModule ? new Set([activeModule.label]) : new Set();
   });
   const collapsed = useShellStore((state) => state.sidebarCollapsed);
   const mobileOpen = useShellStore((state) => state.mobileSidebarOpen);
@@ -84,8 +83,8 @@ function Sidebar() {
 
         <nav className={styles.navigation}>
           {NAVIGATION_SECTIONS.map((section) => (
-            <section className={styles.navSection} key={section.label}>
-              <h2>{section.label}</h2>
+            <section className={styles.navSection} key={section.label || "main"}>
+              {section.label ? <h2>{section.label}</h2> : null}
               <div className={styles.navItems}>
                 {section.items.map((item) => {
                   const active = pathname === item.href;
@@ -97,7 +96,7 @@ function Sidebar() {
                     return (
                       <div className={styles.navModule} key={item.label}>
                         <button
-                          className={`${styles.navParent} ${childActive ? styles.navParentActive : ""} ${item.emphasis === "alert" ? styles.navParentAlert : ""}`}
+                          className={`${styles.navParent} ${childActive ? styles.navParentActive : ""}`}
                           type="button"
                           title={collapsed ? item.label : undefined}
                           aria-expanded={expanded}
@@ -113,7 +112,6 @@ function Sidebar() {
                         >
                           <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
                           <span>{item.label}</span>
-                          {item.emphasis === "alert" ? <i className={styles.alertDot} aria-hidden="true" /> : null}
                           <ChevronRight className={styles.moduleChevron} size={14} aria-hidden="true" />
                         </button>
                         {expanded ? (
@@ -210,20 +208,13 @@ function TopNavigation() {
         </div>
       </div>
 
-      <label className={styles.searchBox}>
-        <Search size={17} aria-hidden="true" />
-        <span className={styles.srOnly}>Search projects</span>
-        <input type="search" placeholder="Search projects, contractors, barangays…" />
-        <kbd>⌘ K</kbd>
-      </label>
-
-      <div className={styles.topbarActions}>
+      <div className={styles.filterBar}>
         <Select value={fiscalYear} onValueChange={setFiscalYear}>
-          <SelectTrigger className={styles.compactSelect} aria-label="Fiscal year">
+          <SelectTrigger className={styles.filterSelect} aria-label="Fiscal year">
             <CalendarDays size={16} aria-hidden="true" />
             <SelectValue />
           </SelectTrigger>
-          <SelectContent align="end">
+          <SelectContent align="start">
             {FISCAL_YEARS.map((year) => (
               <SelectItem key={year} value={year}>
                 FY {year}
@@ -233,14 +224,11 @@ function TopNavigation() {
         </Select>
 
         <Select value={jurisdiction} onValueChange={(value) => setJurisdiction(value as JurisdictionScope)}>
-          <SelectTrigger
-            className={`${styles.compactSelect} ${styles.jurisdictionSelect}`}
-            aria-label="Jurisdiction scope"
-          >
+          <SelectTrigger className={styles.filterSelect} aria-label="Jurisdiction scope">
             <MapPin size={16} aria-hidden="true" />
             <SelectValue />
           </SelectTrigger>
-          <SelectContent align="end">
+          <SelectContent align="start">
             {JURISDICTIONS.map((scope) => (
               <SelectItem key={scope.value} value={scope.value}>
                 {scope.label}
@@ -248,7 +236,9 @@ function TopNavigation() {
             ))}
           </SelectContent>
         </Select>
+      </div>
 
+      <div className={styles.topbarActions}>
         <button className={styles.iconButton} type="button" aria-label="Notifications">
           <Bell size={18} />
           <span className={styles.notificationDot} aria-hidden="true" />

@@ -1,6 +1,7 @@
 import { create } from "zustand";
+import { MATNOG_BARANGAYS } from "@/data/barangays";
 
-export type JurisdictionScope = "municipal" | "all-barangays" | "poblacion" | "gadgaron" | "sinalmacan";
+export type JurisdictionScope = "municipal" | "all-barangays" | (typeof MATNOG_BARANGAYS)[number];
 
 type ShellState = {
   sidebarCollapsed: boolean;

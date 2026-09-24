@@ -37,7 +37,7 @@ type ProjectRegistryState = {
   addActivity: (projectId: string, activity: Omit<ProjectActivity, "id">) => ProjectActivity | undefined;
 };
 
-const initialProjects = createProjectDummyData(72);
+const initialProjects = createProjectDummyData(150);
 
 function today() {
   return new Date().toISOString().slice(0, 10);

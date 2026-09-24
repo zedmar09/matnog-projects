@@ -27,6 +27,11 @@ const projectTemplates = [
   ["Livelihood Processing Center", "Livelihood", "Municipal Agriculture Office"],
   ["Barangay Multi-Purpose Hall", "Public building", "Municipal Engineering Office"],
   ["Digital Permit and Tracking Kiosk", "Digital service", "Municipal IT Office"],
+  ["Solar Streetlight Installation", "Electrification", "Municipal Engineering Office"],
+  ["Fishport Rehabilitation", "Fishery", "Municipal Agriculture Office"],
+  ["Day Care Center Construction", "Social welfare", "Municipal Social Welfare Office"],
+  ["Footbridge Construction", "Road and transport", "Municipal Engineering Office"],
+  ["Communal Irrigation System", "Irrigation", "Municipal Agriculture Office"],
 ] as const;
 
 const statuses: ProjectPipelineStatus[] = [
@@ -308,8 +313,8 @@ export function createProjectDummyData(count = 72): Project[] {
   return Array.from({ length: count }, (_, zeroIndex) => {
     const index = zeroIndex + 1;
     const [baseTitle, projectType, department] = projectTemplates[zeroIndex % projectTemplates.length];
-    const barangay = zeroIndex % 11 === 0 ? null : MATNOG_BARANGAYS[zeroIndex % MATNOG_BARANGAYS.length];
-    const fiscalYear = zeroIndex < 48 ? "2026" : zeroIndex < 62 ? "2025" : "2024";
+    const barangay = zeroIndex % 15 === 0 ? null : MATNOG_BARANGAYS[(zeroIndex * 7 + Math.floor(zeroIndex / 3)) % MATNOG_BARANGAYS.length];
+    const fiscalYear = zeroIndex < 96 ? "2026" : zeroIndex < 128 ? "2025" : "2024";
     const pipelineStatus = statuses[zeroIndex % statuses.length];
     const deliveryStage = pipelineStatus === "Rejected" ? "Planning" : stages[(zeroIndex * 2) % stages.length];
     const budget = amount(0.65, projectType === "Road and transport" ? 18 : 8.5);

@@ -265,7 +265,7 @@
   padding: 0 24px;
   background: rgb(255 255 255 / 96%);
   border-bottom: 1px solid #e6e7e9;
-  grid-template-columns: minmax(150px, 0.68fr) minmax(260px, 1fr) auto;
+  grid-template-columns: auto 1fr auto;
   backdrop-filter: blur(10px);
 }
 
@@ -292,48 +292,28 @@
   line-height: 1.1;
 }
 
-.searchBox {
+.filterBar {
   display: flex;
-  height: 38px;
-  min-width: 0;
-  align-items: center;
-  gap: 9px;
-  padding: 0 10px 0 12px;
-  color: #8a8e95;
-  background: #f7f7f8;
-  border: 1px solid #e4e5e7;
-  border-radius: 8px;
-}
-
-.searchBox:focus-within {
-  background: #fff;
-  border-color: #70b9b2;
-  box-shadow: 0 0 0 3px rgb(21 148 136 / 11%);
-}
-
-.searchBox input {
   min-width: 0;
   flex: 1;
-  color: #202124;
-  background: transparent;
-  border: 0;
-  outline: none;
-  font-size: 12px;
+  align-items: center;
+  gap: 10px;
 }
 
-.searchBox input::placeholder {
-  color: #a3a6ab;
-}
-
-.searchBox kbd {
-  padding: 2px 5px;
-  color: #8b8f95;
+.filterSelect {
+  display: flex;
+  height: 38px;
+  flex: 1;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  color: #565a60;
   background: #fff;
-  border: 1px solid #dedfe2;
-  border-radius: 5px;
-  box-shadow: 0 1px 0 #d7d8da;
-  font-family: inherit;
-  font-size: 9px;
+  border: 1px solid #e3e4e6;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 550;
 }
 
 .topbarActions {
@@ -342,26 +322,6 @@
   gap: 8px;
 }
 
-.compactSelect {
-  display: flex;
-  height: 36px;
-  align-items: center;
-  gap: 7px;
-  padding: 0 9px;
-  color: #565a60;
-  background: #fff;
-  border: 1px solid #e3e4e6;
-  border-radius: 8px;
-}
-
-.compactSelect {
-  font-size: 11px;
-  font-weight: 550;
-}
-
-.jurisdictionSelect {
-  min-width: 152px;
-}
 
 .iconButton,
 .mobileMenu,
@@ -562,7 +522,6 @@
   .topbar {
     gap: 14px;
     padding: 0 18px;
-    grid-template-columns: auto minmax(220px, 1fr) auto;
   }
 
   .profileTrigger {
@@ -571,10 +530,6 @@
 
   .profileCopy,
   .profileTrigger > svg {
-    display: none;
-  }
-
-  .jurisdictionSelect {
     display: none;
   }
 }
@@ -679,8 +634,7 @@
     font-size: 16px;
   }
 
-  .searchBox kbd,
-  .compactSelect {
+  .filterBar {
     display: none;
   }
 
